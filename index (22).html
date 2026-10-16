@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escaperoom skemmtó</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap">
+<style>
+:root { --bg: #ffffff; --fg: #111111; --fill: #ffffff; --mid: #bbbbbb; --font: "Fredoka", "Comic Sans MS", system-ui, sans-serif; }
+@media (prefers-color-scheme: dark) { :root { --bg: #111111; --fg: #f2f2f2; --fill: #111111; --mid: #555555; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); text-align: center; padding: 40px 16px; }
+main { max-width: 360px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+h1 { margin: 0; font-size: 2.2rem; }
+#lock { width: 100%; }
+.shackle { width: 60%; display: block; margin: 0 auto -10px; transition: transform .4s; }
+.shackle path { fill: none; stroke: var(--mid); stroke-width: 24; }
+.shackle .edge { stroke: var(--fg); stroke-width: 34; }
+.open .shackle { transform: translateY(-20%); }
+.body { background: var(--fill); border: 6px solid var(--fg); border-radius: 24px; padding: 28px 16px; display: flex; gap: 10px; justify-content: center; }
+.shake .body { animation: shake .35s; }
+@keyframes shake { 25%,75% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
+.digit { width: 60px; height: 76px; font: 700 2.6rem var(--font); color: var(--fg); background: var(--bg); border: 5px solid var(--fg); border-radius: 14px; cursor: pointer; }
+.digit:active { transform: scale(.94); }
+button:focus-visible { outline: 4px dashed var(--fg); outline-offset: 3px; }
+.go { font: 700 1.4rem var(--font); padding: 12px 36px; border: 5px solid var(--fg); border-radius: 16px; background: var(--fg); color: var(--bg); cursor: pointer; }
+.go[hidden] { display: none; }
+.msg { font-size: 1.3rem; min-height: 1.6em; margin: 0; }
+small { opacity: .7; font-size: 1rem; }
+@media (prefers-reduced-motion: reduce) { .shackle { transition: none; } .shake .body { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Escaperoom skemmtó</h1>
+  <small>Pikkaðu á tölurnar til að breyta þeim</small>
+  <div id="lock">
+    <svg class="shackle" viewBox="0 0 200 120" aria-hidden="true">
+      <path class="edge" d="M35 120 V80 A65 65 0 0 1 165 80 V120"/>
+      <path d="M35 120 V80 A65 65 0 0 1 165 80 V120"/>
+    </svg>
+    <div class="body" id="digits"></div>
+  </div>
+  <button class="go" id="go">Opna</button>
+  <p class="msg" id="msg" role="status"></p>
+</main>
+
+<script>
+const code = "9746";
+const vals = [0, 0, 0, 0];
+const box = document.getElementById("digits"), lock = document.getElementById("lock"), msg = document.getElementById("msg");
+
+vals.forEach((_, i) => {
+  const b = document.createElement("button");
+  b.className = "digit"; b.textContent = 0; b.setAttribute("aria-label", "Tölustafur " + (i + 1));
+  b.onclick = () => { if (lock.classList.contains("open")) return; vals[i] = (vals[i] + 1) % 10; b.textContent = vals[i]; msg.textContent = ""; };
+  box.appendChild(b);
+});
+
+document.getElementById("go").onclick = () => {
+  if (vals.join("") === code) {
+    lock.classList.add("open");
+    msg.textContent = "Opið! Þú slappst út!";
+    document.getElementById("go").hidden = true;
+  } else {
+    msg.textContent = "Nei! Reyndu aftur.";
+    lock.classList.remove("shake"); void lock.offsetWidth; lock.classList.add("shake");
+  }
+};
+</script>
+</body>
+</html>
